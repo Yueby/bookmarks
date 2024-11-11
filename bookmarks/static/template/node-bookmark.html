@@ -1,0 +1,104 @@
+<div id="app">
+    <!-- 节点书签视图 -->
+    <div class="view-container">
+        <!-- 分组管理区域 -->
+        <div class="group-manager">
+            <!-- 分组操作按钮 -->
+            <div class="group-actions">
+                <ui-button type="success" @click="showNodeGroupInput = true" outline title="新建分组">
+                    <svg width="12" height="12" viewBox="0 0 12 12">
+                        <path d="M6 1v10M1 6h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </ui-button>
+                <ui-button type="danger" @click="clearAllNodes()" outline title="清空">
+                    <svg width="12" height="12" viewBox="0 0 12 12">
+                        <path d="M2 2l8 8M2 10L10 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </ui-button>
+            </div>
+
+            <!-- 分组列表 -->
+            <div class="group-list">
+                <!-- 新建分组输入框 -->
+                <div v-if="showNodeGroupInput" class="group-input-container">
+                    <ui-input 
+                        ref="nodeGroupInput"
+                        v-model="newNodeGroupName" 
+                        placeholder="输入分组名称"
+                        @keyup.enter="confirmNewNodeGroup"
+                        @keyup.esc="cancelNewNodeGroup"
+                    ></ui-input>
+                    <ui-button type="success" @click="confirmNewNodeGroup" outline>
+                        <svg width="12" height="12" viewBox="0 0 12 12">
+                            <path d="M2 6l3 3 5-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </ui-button>
+                    <ui-button type="danger" @click="cancelNewNodeGroup" outline>
+                        <svg width="12" height="12" viewBox="0 0 12 12">
+                            <path d="M2 2l8 8M2 10L10 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </ui-button>
+                </div>
+
+                <!-- 分组列表项 -->
+                <div v-else class="group-items">
+                    <div class="group-item" 
+                        v-for="group in sortedNodeGroups" 
+                        :key="group.name"
+                        :class="{ active: currentNodeGroup?.id === group.id }"
+                        @click="switchNodeGroup(group.name)"
+                    >
+                        <span class="group-name" :style="{ borderLeftColor: group.color }">{{group.name}}</span>
+                        <span class="group-count">({{group.nodeList.length}})</span>
+                        <ui-button 
+                            v-if="currentNodeGroup?.id === group.id"
+                            type="warning" 
+                            @click.stop="removeNodeGroup(group)" 
+                            outline
+                            class="group-delete"
+                        >
+                            <svg width="12" height="12" viewBox="0 0 12 12">
+                                <path d="M2 2l8 8M2 10L10 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </ui-button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 节点列表区域 -->
+        <ui-drag-area class="node-area" droppable="node" @drop="onNodeDrop($event)">
+            <div class="node-content">
+                <div v-if="isLoading" class="loading"></div>
+                <div v-else-if="isNodeEmpty" class="empty-state">
+                    {{ currentNodeGroup ? '拖拽场景中的节点到此处' : '请选择分组' }}
+                </div>
+                <template v-else>
+                    <div class="node-item" 
+                        v-for="(item, index) in filteredNodeList"
+                        :key="item.uuid"
+                    >
+                        <div class="node-content" @click="jumpToNode(item)">
+                            <ui-icon value="node"></ui-icon>
+                            <div class="node-info">
+                                <div class="node-name">{{item.name}}</div>
+                                <div class="scene-name">{{item.sceneName}}</div>
+                            </div>
+                            <ui-button 
+                                v-if="canOperate"
+                                type="default" 
+                                @click.stop="deleteNode(item.uuid)" 
+                                class="node-delete"
+                                outline
+                            >
+                                <svg width="8" height="8" viewBox="0 0 8 8">
+                                    <path d="M1 1l6 6M1 7L7 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                </svg>
+                            </ui-button>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </ui-drag-area>
+    </div>
+</div> 

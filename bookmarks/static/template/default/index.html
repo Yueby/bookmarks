@@ -1,0 +1,123 @@
+<div id="app">
+	<!-- 导航栏 -->
+	<div class="nav-bar">
+		<div class="nav-item" :class="{ active: currentView === ViewType.ASSETS }" @click="switchView(ViewType.ASSETS)">{{ i18n.asset_bookmark }}</div>
+		<div class="nav-item" :class="{ active: currentView === ViewType.NODES }" @click="switchView(ViewType.NODES)">{{ i18n.node_bookmark }}</div>
+	</div>
+
+	<!-- 内容区域 -->
+	<div class="panel-container">
+		<!-- 资源书签内容 -->
+		<div v-if="currentView === ViewType.ASSETS" class="view-container">
+			<!-- 分组管理区域 -->
+			<div class="group-manager">
+				<!-- 分组操作按钮 -->
+				<div class="group-actions">
+					<ui-button type="success" @click="showGroupInput = true" outline title="新建分组">
+						<ui-icon value="add"></ui-icon>
+					</ui-button>
+					<ui-button type="danger" @click="clearAll()" outline title="清空">
+						<ui-icon value="clear"></ui-icon>
+					</ui-button>
+				</div>
+
+				<!-- 分组列表 -->
+				<div class="group-list">
+					<!-- 新建分组输入框 -->
+					<div v-if="showGroupInput" class="group-input-container">
+						<ui-input 
+							v-model="newGroupName" 
+							placeholder="输入分组名称"
+							@keyup.enter="addGroup"
+							@keyup.esc="showGroupInput = false"
+						></ui-input>
+						<ui-button type="success" @click="addGroup" outline>
+							<ui-icon value="check"></ui-icon>
+						</ui-button>
+						<ui-button type="danger" @click="showGroupInput = false" outline>
+							<ui-icon value="close"></ui-icon>
+						</ui-button>
+					</div>
+
+					<!-- 分组列表项 -->
+					<div v-else class="group-items">
+						<div
+							class="group-item"
+							v-for="(group, index) in sortedGroups"
+							:key="group.id"
+							:class="{ active: currentGroup?.id === group.id, dragging: dragState === 'group' && dragIndex === index }"
+							@click="switchGroup(group.id)"
+							draggable="true"
+							@dragstart="onDragStartGroup($event, group.id)"
+							@dragend="onDragEndGroup($event)"
+							@dragover.prevent="onDragOverGroup($event)"
+							@drop="onDropGroup($event, group.id)"
+						>
+							<div class="group-content">
+								<span class="group-name">{{group.name}}</span>
+								<span class="group-count">{{group.bookmarkList.length}}</span>
+							</div>
+							<ui-button 
+								v-if="currentGroup?.id === group.id" 
+								type="warning" 
+								@click.stop.prevent="removeGroup(group)" 
+								outline 
+								class="group-delete"
+							>
+								<div v-icon="'delete'"></div>
+							</ui-button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- 资源拖拽区域 -->
+			<div class="mark-area" 
+				@dragover.prevent="onDragOverGroup"
+				@drop="onDrop"
+			>
+				<div class="mark-content">
+					<div v-if="isLoading" class="loading">
+						<ui-loading></ui-loading>
+					</div>
+					<div v-else-if="isEmpty" class="empty-tip">
+						{{ currentGroup ? '拖拽资源到此处' : '请选择分组' }}
+					</div>
+					<template v-else>
+						<div class="bookmark-list">
+							<div
+								class="bookmark-item"
+								v-for="bookmark in filteredBookmarkList"
+								:key="bookmark.id"
+								:class="{ dragging: isDragging && draggedBookmark?.id === bookmark.id }"
+								@click="onBookmarkClick(bookmark)"
+								@dblclick="onBookmarkDblClick(bookmark)"
+								draggable="true"
+								@dragstart="onDragStartBookmark($event, bookmark)"
+								@dragend="onDragEndBookmark($event)"
+								@dragover.prevent="onDragOverBookmark($event)"
+								@drop="onDropBookmark($event, bookmark)"
+							>
+								<div class="bookmark-content">
+									<ui-icon :value="bookmark.assetType"></ui-icon>
+									<span class="bookmark-name">{{bookmark.name}}</span>
+									<ui-button 
+										type="danger" 
+										@click.stop.prevent="removeBookmark(bookmark)" 
+										outline 
+										class="bookmark-delete"
+									>
+										<div v-icon="'delete'"></div>
+									</ui-button>
+								</div>
+							</div>
+						</div>
+					</template>
+				</div>
+			</div>
+		</div>
+
+		<!-- 节点书签内容 -->
+		<div v-else id="node-content"></div>
+	</div>
+</div>

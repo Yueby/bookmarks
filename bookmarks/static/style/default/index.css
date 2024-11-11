@@ -1,0 +1,441 @@
+/* 基础布局 - 使用 CSS 变量控制偏移 */
+:root {
+	--app-padding: 6px;
+	--nav-height: 28px;
+	--group-height: 120px;
+	--spacing: 6px;
+	--total-offset: calc(var(--app-padding) * 2 + var(--nav-height) + var(--group-height) + var(--spacing) * 3);
+}
+
+#app {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	padding: var(--app-padding);
+	color: var(--color-normal-text);
+	background: var(--color-normal-background);
+	gap: var(--spacing);
+	font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Ubuntu, 'Open Sans', sans-serif;
+}
+
+/* 导航栏 */
+.nav-bar {
+	display: flex;
+	gap: 1px;
+	padding: 2px;
+	background: rgba(0, 0, 0, 0.2);
+	border-radius: 4px;
+	position: relative;
+	overflow: hidden;
+	backdrop-filter: blur(8px);
+	border: 1px solid rgba(255, 255, 255, 0.05);
+	height: var(--nav-height);
+}
+
+.nav-item {
+	flex: 1;
+	padding: 2px 12px;
+	cursor: pointer;
+	border-radius: 3px;
+	transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+	font-size: 11px;
+	text-align: center;
+	color: var(--color-normal-text-weak);
+	position: relative;
+	overflow: hidden;
+	user-select: none;
+	line-height: 20px;
+}
+
+.nav-item:hover {
+	color: var(--color-normal-text);
+	background: rgba(255, 255, 255, 0.05);
+}
+
+.nav-item.active {
+	color: var(--color-primary-text);
+	background: var(--color-primary-fill);
+	font-weight: 500;
+}
+
+.nav-item.active::after {
+	content: '';
+	position: absolute;
+	bottom: 2px;
+	left: 50%;
+	transform: translateX(-50%);
+	width: 12px;
+	height: 2px;
+	background: currentColor;
+	border-radius: 1px;
+	opacity: 0.6;
+}
+
+/* 内容区域 - 优化布局 */
+.panel-container {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	flex: 1;
+	min-height: 0;
+	overflow: hidden;
+}
+
+.view-container {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	flex: 1;
+	min-height: 0;
+}
+
+/* 分组管理 - 减小内边距 */
+.group-manager {
+	background: rgba(0, 0, 0, 0.1);
+	border-radius: 6px;
+	padding: 6px;
+	border: 1px solid rgba(255, 255, 255, 0.05);
+	height: var(--group-height);
+}
+
+.group-actions {
+	display: flex;
+	gap: 4px;
+	margin-bottom: 8px;
+}
+
+/* 分组列表容器 */
+.group-list {
+	display: flex;
+	flex-direction: column;
+	padding: 4px;
+	max-height: 120px;
+	background: rgba(0, 0, 0, 0.1);
+	border-radius: 6px;
+	overflow: hidden;
+}
+
+/* 分组项容器 */
+.group-items {
+	display: flex;
+	flex-wrap: nowrap;
+	gap: 4px;
+	width: 100%;
+	min-height: 28px;
+	overflow-x: auto;
+	overflow-y: hidden;
+	padding-bottom: 4px;
+}
+
+/* 分组项 */
+.group-item {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	padding: 3px 8px;
+	border-radius: 3px;
+	background: rgba(255, 255, 255, 0.03);
+	transition: all 0.2s ease;
+	border: 1px solid transparent;
+	cursor: pointer;
+	height: 22px;
+	flex: 0 0 auto;
+	width: auto;
+	min-width: unset;
+	max-width: unset;
+	white-space: nowrap;
+	isolation: isolate;
+}
+
+.group-content {
+	display: flex;
+	align-items: center;
+	min-width: 0;
+	gap: 8px;
+}
+
+.group-name {
+	font-size: 11px;
+	padding: 0 2px;
+}
+
+.group-count {
+	font-size: 10px;
+	padding: 0 4px;
+	border-radius: 6px;
+	background: rgba(0, 0, 0, 0.2);
+	color: var(--color-normal-text-weak);
+	min-width: 16px;
+	text-align: center;
+	height: 14px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	opacity: 0;
+	transition: all 0.2s ease;
+	margin-left: 4px;
+}
+
+.group-item:hover .group-count {
+	opacity: 1;
+}
+
+.group-item:hover {
+	background: rgba(255, 255, 255, 0.05);
+	border-color: rgba(255, 255, 255, 0.1);
+}
+
+.group-item.active {
+	background: var(--color-primary-fill-weak);
+	border-color: var(--color-primary-border-weak);
+}
+
+/* 书签区域 - 优化内边距 */
+.mark-area {
+	flex: 1;
+	border-radius: 8px;
+	background: rgba(0, 0, 0, 0.1);
+	min-height: 0;
+	border: 1px solid rgba(255, 255, 255, 0.05);
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+	height: calc(100vh - var(--total-offset));
+}
+
+.mark-content {
+	flex: 1;
+	padding: 6px;
+	overflow-y: auto;
+	overflow-x: hidden;
+	background: rgba(0, 0, 0, 0.05);
+	min-height: 0;
+}
+
+.bookmark-list {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+	gap: 4px;
+	padding: 2px;
+	width: 100%;
+}
+
+.bookmark-item {
+	position: relative;
+	padding: 8px 10px;
+	border-radius: 6px;
+	background: rgba(255, 255, 255, 0.03);
+	transition: all 0.2s ease;
+	border: 1px solid transparent;
+	cursor: pointer;
+	isolation: isolate;
+}
+
+.bookmark-item:hover {
+	background: rgba(255, 255, 255, 0.05);
+	transform: translateY(-1px);
+	border-color: rgba(255, 255, 255, 0.1);
+}
+
+.bookmark-item:active {
+	transform: translateY(0);
+	background: rgba(255, 255, 255, 0.07);
+}
+
+.bookmark-content {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.bookmark-name {
+	font-size: 12px;
+	flex: 1;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	margin-right: 24px;
+}
+
+.group-count {
+	position: absolute;
+	right: 8px;
+	top: 50%;
+	transform: translateY(-50%);
+	font-size: 10px;
+	padding: 1px 6px;
+	border-radius: 10px;
+	background: var(--color-normal-fill);
+	color: var(--color-normal-text-weak);
+}
+
+/* 按钮样式 */
+ui-button {
+	opacity: 0.8;
+	transition: all 0.2s ease;
+}
+
+ui-button:hover {
+	opacity: 1;
+	transform: translateY(-1px);
+}
+
+/* 删除按钮 */
+.bookmark-delete,
+.group-delete {
+	opacity: 0;
+	position: absolute;
+	right: -6px;
+	top: -6px;
+	width: 18px !important;
+	height: 18px !important;
+	min-width: unset !important;
+	padding: 2px !important;
+	border-radius: 50% !important;
+	background: rgba(255, 255, 255, 0.1) !important;
+	backdrop-filter: blur(2px);
+	border: 1px solid rgba(255, 255, 255, 0.1) !important;
+	transform: scale(0.8);
+	transition: all 0.2s ease;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 9999;
+	pointer-events: auto;
+}
+
+.bookmark-item:hover .bookmark-delete,
+.group-item:hover .group-delete {
+	opacity: 1;
+	transform: scale(1);
+}
+
+.bookmark-delete:hover,
+.group-delete:hover {
+	background: rgba(255, 0, 0, 0.2) !important;
+	border-color: rgba(255, 0, 0, 0.3) !important;
+	transform: scale(1.1);
+}
+
+/* 调整容器相对定位 */
+.bookmark-item,
+.group-item {
+	position: relative;
+	isolation: isolate;
+}
+
+/* 调整内容区域，为删除按钮留出空间 */
+.bookmark-content,
+.group-item {
+	padding-right: 8px;
+}
+
+/* 调整图标大小 */
+.bookmark-delete ui-icon,
+.group-delete ui-icon {
+	width: 12px;
+	height: 12px;
+	opacity: 0.9;
+}
+
+/* 图标样式 */
+ui-icon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 14px;
+	height: 14px;
+	opacity: 0.8;
+}
+
+/* 输入框容器 */
+.group-input-container {
+	display: flex;
+	gap: 4px;
+	padding: 4px;
+	background: var(--color-normal-background);
+	border-radius: 4px;
+	width: 100%;
+}
+
+.group-input-container ui-input {
+	flex: 1;
+}
+
+.group-input-container ui-button {
+	padding: 4px;
+}
+
+/* 滚动条 */
+::-webkit-scrollbar {
+	width: 6px;
+	height: 6px;
+}
+
+::-webkit-scrollbar-track {
+	background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+	background: var(--color-normal-border-weak);
+	border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+	background: var(--color-normal-border);
+}
+
+/* 空状态 */
+.empty-tip,
+.loading {
+	flex: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 100px;
+}
+
+/* 加载状态 */
+.loading {
+	height: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+/* 动画 */
+@keyframes fadeInUp {
+	from {
+		opacity: 0;
+		transform: translateY(10px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+.bookmark-item {
+	animation: fadeInUp 0.3s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+/* 拖拽状态 */
+.group-item.dragging,
+.bookmark-item.dragging {
+	opacity: 0.5;
+	transform: scale(0.98);
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* 响应式调整 */
+@media (max-width: 600px) {
+	.bookmark-list {
+		grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+	}
+}
+
+@media (min-width: 900px) {
+	.group-item {
+		width: auto;
+	}
+}
