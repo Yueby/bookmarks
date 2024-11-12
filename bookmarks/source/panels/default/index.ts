@@ -124,7 +124,8 @@ const BookmarksPanel = defineComponent({
 		// 书签点击
 		async onBookmarkClick(bookmark: AssetBookmark): Promise<void> {
 			// 使用 broadcast 发送闪烁消息
-			Editor.Message.broadcast('ui-kit:touch-asset', [bookmark.uuid]);
+			// Editor.Message.broadcast('ui-kit:touch-asset', [bookmark.uuid]);
+			Editor.Message.broadcast('twinkle', bookmark.uuid);
 		},
 
 		// 添加双击处理
@@ -139,12 +140,12 @@ const BookmarksPanel = defineComponent({
 				if (!event.dataTransfer) return;
 				event.dataTransfer.setData('group-id', groupId);
 				event.dataTransfer.effectAllowed = 'move';
-				
+
 				const target = event.target as HTMLElement;
 				target.classList.add('dragging');
-				
+
 				this.dragState = 'group';
-				this.dragIndex = this.groups.findIndex(g => g.id === groupId);
+				this.dragIndex = this.groups.findIndex((g) => g.id === groupId);
 			} catch (err) {
 				handleError(err, '开始拖拽失败');
 			}
@@ -176,8 +177,8 @@ const BookmarksPanel = defineComponent({
 				const sourceId = event.dataTransfer.getData('group-id');
 				if (!sourceId || sourceId === targetGroupId) return;
 
-				const sourceIndex = this.groups.findIndex(g => g.id === sourceId);
-				const targetIndex = this.groups.findIndex(g => g.id === targetGroupId);
+				const sourceIndex = this.groups.findIndex((g) => g.id === sourceId);
+				const targetIndex = this.groups.findIndex((g) => g.id === targetGroupId);
 
 				if (sourceIndex > -1 && targetIndex > -1) {
 					const [movedGroup] = this.groups.splice(sourceIndex, 1);
@@ -405,10 +406,10 @@ const BookmarksPanel = defineComponent({
 				if (!event.dataTransfer) return;
 				event.dataTransfer.setData('bookmark-id', bookmark.id);
 				event.dataTransfer.effectAllowed = 'move';
-				
+
 				const target = event.target as HTMLElement;
 				target.classList.add('dragging');
-				
+
 				this.isDragging = true;
 				this.draggedBookmark = bookmark;
 			} catch (err) {
@@ -442,8 +443,8 @@ const BookmarksPanel = defineComponent({
 				const sourceId = event.dataTransfer.getData('bookmark-id');
 				if (!sourceId || sourceId === targetBookmark.id) return;
 
-				const sourceIndex = this.currentGroup.bookmarkList.findIndex(b => b.id === sourceId);
-				const targetIndex = this.currentGroup.bookmarkList.findIndex(b => b.id === targetBookmark.id);
+				const sourceIndex = this.currentGroup.bookmarkList.findIndex((b) => b.id === sourceId);
+				const targetIndex = this.currentGroup.bookmarkList.findIndex((b) => b.id === targetBookmark.id);
 
 				if (sourceIndex > -1 && targetIndex > -1) {
 					const [movedBookmark] = this.currentGroup.bookmarkList.splice(sourceIndex, 1);
